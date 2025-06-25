@@ -22,6 +22,12 @@ export default function SuccessPage() {
       });
     }, [navigate]);
   
+    const handleSettings = () => {
+        chrome.storage.local.set({ copilot_from_settings: true }, () => {
+          navigate("/");
+        });
+      };
+
     if (pageText === null) return "Loading page...";
   
     return (
@@ -29,7 +35,7 @@ export default function SuccessPage() {
         <MainContent
           pageText={pageText}
           mcpServers={mcpList}
-          onSettings={() => navigate("/")}
+          onSettings={handleSettings}
         />
         <InlineCopilotChat />
       </CopilotLayout>

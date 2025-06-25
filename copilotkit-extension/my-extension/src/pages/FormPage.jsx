@@ -9,14 +9,23 @@ export default function FormPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    chrome.storage.local.get(["copilot_api_key", "copilot_mcp_servers"], (result) => {
+    chrome.storage.local.get(["copilot_api_key", "copilot_from_settings", "copilot_mcp_servers"], (result) => {
+      if (result.copilot_api_key && !result.copilot_from_settings) {
+        navigate("/success");
+        return;
+      }
+  
       if (result.copilot_api_key) {
         setExistingKey(result.copilot_api_key);
-        setText(result.copilot_api_key); // show in input for editing
+        setText(result.copilot_api_key);
       }
+  
       if (result.copilot_mcp_servers) {
-        setMcpServers(result.copilot_mcp_servers.map(s => s.endpoint));
+        setMcpServers(result.copilot_mcp_servers.map((s) => s.endpoint));
       }
+  
+      // Clean the flag so it only works once
+      chrome.storage.local.remove("copilot_from_settings");
     });
   }, []);
 
