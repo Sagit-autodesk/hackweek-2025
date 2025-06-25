@@ -14,7 +14,7 @@
     top: "0",
     right: "0",
     height: "100vh",
-    width: "300px",
+    width: "400px",
     border: "none",
     zIndex: "999999",
     background: "white",

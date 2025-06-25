@@ -6,7 +6,7 @@ export default function SidebarApp() {
   return (
     <div
       style={{
-        width: 300,
+        width: 400,
         height: "100vh",
         background: "#f0f0f0",
         padding: 12,

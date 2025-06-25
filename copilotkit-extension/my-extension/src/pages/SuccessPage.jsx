@@ -76,7 +76,7 @@ function MainContent({ pageText, mcpServers, onSettings }) {
 
   return (
     <div>
-      <div
+      {/*<div
         style={{
           fontSize: 12,
           marginBottom: 12,
@@ -88,7 +88,7 @@ function MainContent({ pageText, mcpServers, onSettings }) {
       >
         <strong>Debug:</strong> First 100 characters:{" "}
         <code>{pageText.slice(0, 100) || "No page text found"}</code>
-      </div>
+      </div>*/}
 
       <button
         onClick={onSettings}
