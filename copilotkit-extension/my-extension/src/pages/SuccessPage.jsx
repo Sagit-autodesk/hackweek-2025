@@ -7,66 +7,49 @@ import CopilotLayout from "../components/CopilotLayout";
 import InlineCopilotChat from "../components/InlineCopilotChat";
 
 export default function SuccessPage() {
-  const [token, setToken] = useState("");
-  const [pageText, setPageText] = useState("");
-  const navigate = useNavigate();
+    const [pageText, setPageText] = useState(null); // null to detect when it's ready
+    const [mcpList, setMcpList] = useState([]);
+    const navigate = useNavigate();
+  
+    useEffect(() => {
+      chrome.storage.local.get(["copilot_api_key", "copilot_page_text", "copilot_mcp_servers"], (res) => {
+        if (!res.copilot_api_key) {
+          navigate("/");
+        } else {
+          setPageText(res.copilot_page_text || "");
+          setMcpList(res.copilot_mcp_servers || []);
+        }
+      });
+    }, [navigate]);
+  
+    if (pageText === null) return "Loading page...";
+  
+    return (
+      <CopilotLayout>
+        <MainContent
+          pageText={pageText}
+          mcpServers={mcpList}
+          onSettings={() => navigate("/")}
+        />
+        <InlineCopilotChat />
+      </CopilotLayout>
+    );
+  }
+  
+
+function MainContent({ pageText, mcpServers, onSettings }) {
+  const { setMcpServers } = useCopilotChat();
 
   useEffect(() => {
-    chrome.storage.local.get("copilot_api_key", (result) => {
-      if (result.copilot_api_key) {
-        setToken(result.copilot_api_key);
-      } else {
-        navigate("/");
-      }
-    });
-
-    const handleMessage = (event) => {
-      if (event.data?.type === "PAGE_TEXT") {
-        setPageText(event.data.text);
-      }
-    };
-
-    window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, [navigate]);
-
-  const handleSettings = () => {
-    navigate("/");
-  };
-
-  return (
-    <CopilotLayout>
-      <MainContent
-        pageText={pageText}
-        onSettings={handleSettings}
-      />
-      <InlineCopilotChat/>
-    </CopilotLayout>
-  );
-}
-
-function MainContent({ pageText, onSettings }) {
-  const { mcpServers, setMcpServers } = useCopilotChat();
-  const [newMcpServer, setNewMcpServer] = useState("");
-
-  useEffect(() => {
-    setMcpServers([
-      // Add predefined MCP servers here if needed
-    ]);
-  }, []);
+    if (Array.isArray(mcpServers)) {
+      setMcpServers(mcpServers);
+    }
+  }, [mcpServers, setMcpServers]);
 
   useCopilotReadable({
     description: "The visible text content of the current page",
-    value: pageText || "", // safe default while loading
+    value: pageText || "",
   });
-
-  const addMcpServer = (server) => {
-    setMcpServers([...mcpServers, server]);
-  };
-
-  const removeMcpServer = (url) => {
-    setMcpServers(mcpServers.filter((s) => s.endpoint !== url));
-  };
 
   useCopilotChatSuggestions({
     maxSuggestions: 3,
@@ -86,53 +69,20 @@ function MainContent({ pageText, onSettings }) {
   });
 
   return (
-    <div style={{ paddingBottom: 16 }}>
-      <h3 style={{ marginTop: 0 }}>Page Text</h3>
+    <div>
       <div
         style={{
-          background: "#fff",
-          padding: 5,
-          border: "1px solid #ccc",
-          borderRadius: 4,
           fontSize: 12,
-          height: "200px",
-          overflowY: "auto",
-          whiteSpace: "pre-wrap",
+          marginBottom: 12,
+          padding: 8,
+          backgroundColor: "#fef3c7",
+          border: "1px solid #fcd34d",
+          borderRadius: 4,
         }}
       >
-        {pageText || "Loading page text..."}
+        <strong>Debug:</strong> First 100 characters:{" "}
+        <code>{pageText.slice(0, 100) || "No page text found"}</code>
       </div>
-
-      <h3>MCP Servers</h3>
-      <ul style={{ paddingLeft: 0 }}>
-        {mcpServers.map((server, i) => (
-          <li key={i} style={{ listStyle: "none", marginBottom: 6 }}>
-            {server.endpoint}
-            <button
-              style={{ marginLeft: 8 }}
-              onClick={() => removeMcpServer(server.endpoint)}
-            >
-              ✕
-            </button>
-          </li>
-        ))}
-      </ul>
-      <input
-        type="text"
-        placeholder="Enter MCP server URL"
-        value={newMcpServer}
-        onChange={(e) => setNewMcpServer(e.target.value)}
-      />
-      <button
-        onClick={() => {
-          if (newMcpServer) {
-            addMcpServer({ endpoint: newMcpServer });
-            setNewMcpServer("");
-          }
-        }}
-      >
-        Add Server
-      </button>
 
       <button
         onClick={onSettings}
@@ -148,23 +98,24 @@ function MainContent({ pageText, onSettings }) {
       >
         Settings
       </button>
+
       <button
         onClick={() => {
-        chrome.storage.local.remove("copilot_chat_messages", () => {
-            location.reload(); // reload sidebar to reflect cleared state
-        });
+          chrome.storage.local.remove("copilot_chat_messages", () => {
+            location.reload();
+          });
         }}
         style={{
-        width: "100%",
-        padding: 6,
-        backgroundColor: "#ef4444", // red
-        color: "white",
-        border: "none",
-        borderRadius: 4,
+          width: "100%",
+          padding: 6,
+          backgroundColor: "#ef4444",
+          color: "white",
+          border: "none",
+          borderRadius: 4,
         }}
-    >
+      >
         Clear
-    </button>
+      </button>
     </div>
   );
 }

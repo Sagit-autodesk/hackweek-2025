@@ -23,19 +23,18 @@
 
   document.body.appendChild(iframe);
 
-  // ✅ Function to send page text
   const sendPageText = () => {
     const text = document.body.innerText;
-    const targetOrigin = new URL(iframe.src).origin;
-    iframe.contentWindow?.postMessage({ type: "PAGE_TEXT", text }, targetOrigin);
+    chrome.runtime.sendMessage({ type: "STORE_PAGE_TEXT", text }, () => {
+      // 🔍 Optional debug log
+      console.log("[content.js] Page text sent to background");
+    });
   };
 
-  // ✅ Send once when iframe loads
   iframe.onload = () => {
     sendPageText();
   };
 
-  // ✅ Watch for DOM changes and re-send text
   const observer = new MutationObserver(() => {
     sendPageText();
   });
@@ -46,7 +45,6 @@
     characterData: true,
   });
 
-  // Optional cleanup if iframe is removed
   window.addEventListener("beforeunload", () => {
     observer.disconnect();
   });
