@@ -30,24 +30,22 @@ export default function SuccessPage() {
     return () => window.removeEventListener("message", handleMessage);
   }, [navigate]);
 
-  const handleReset = () => {
-    chrome.storage.local.remove("copilot_api_key", () => {
-      navigate("/");
-    });
+  const handleSettings = () => {
+    navigate("/");
   };
 
   return (
     <CopilotLayout>
       <MainContent
         pageText={pageText}
-        onReset={handleReset}
+        onSettings={handleSettings}
       />
       <InlineCopilotChat/>
     </CopilotLayout>
   );
 }
 
-function MainContent({ pageText, onReset }) {
+function MainContent({ pageText, onSettings }) {
   const { mcpServers, setMcpServers } = useCopilotChat();
   const [newMcpServer, setNewMcpServer] = useState("");
 
@@ -137,7 +135,7 @@ function MainContent({ pageText, onReset }) {
       </button>
 
       <button
-        onClick={onReset}
+        onClick={onSettings}
         style={{
           marginTop: 12,
           width: "100%",
@@ -148,8 +146,25 @@ function MainContent({ pageText, onReset }) {
           borderRadius: 4,
         }}
       >
-        Reset
+        Settings
       </button>
+      <button
+        onClick={() => {
+        chrome.storage.local.remove("copilot_chat_messages", () => {
+            location.reload(); // reload sidebar to reflect cleared state
+        });
+        }}
+        style={{
+        width: "100%",
+        padding: 6,
+        backgroundColor: "#ef4444", // red
+        color: "white",
+        border: "none",
+        borderRadius: 4,
+        }}
+    >
+        Clear
+    </button>
     </div>
   );
 }
