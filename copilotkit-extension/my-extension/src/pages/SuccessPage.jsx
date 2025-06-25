@@ -15,14 +15,13 @@ export default function SuccessPage() {
       }
     });
 
-    // ✅ Ask background for page text
-    chrome.runtime.sendMessage({ type: "GET_PAGE_TEXT" }, (response) => {
-        if (response?.text) {
-        setPageText(response.text);
-        } else {
-        setPageText("[No text returned or blocked]");
+    const handleMessage = (event) => {
+        if (event.data?.type === "PAGE_TEXT") {
+          setPageText(event.data.text);
         }
-    });
+      };
+    
+      window.addEventListener("message", handleMessage);
   }, [navigate]);
 
   const handleReset = () => {

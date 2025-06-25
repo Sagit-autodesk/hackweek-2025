@@ -23,14 +23,31 @@
 
   document.body.appendChild(iframe);
 
-  // ✅ Send page text to the iframe after it loads
-  iframe.onload = () => {
+  // ✅ Function to send page text
+  const sendPageText = () => {
     const text = document.body.innerText;
-  
-    // ✅ Use the extension origin to scope it safely
-    const origin = new URL(chrome.runtime.getURL("/")).origin;
-  
-    iframe.contentWindow.postMessage({ type: "PAGE_TEXT", text }, origin);
+    const targetOrigin = new URL(iframe.src).origin;
+    iframe.contentWindow?.postMessage({ type: "PAGE_TEXT", text }, targetOrigin);
   };
-  
+
+  // ✅ Send once when iframe loads
+  iframe.onload = () => {
+    sendPageText();
+  };
+
+  // ✅ Watch for DOM changes and re-send text
+  const observer = new MutationObserver(() => {
+    sendPageText();
+  });
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+    characterData: true,
+  });
+
+  // Optional cleanup if iframe is removed
+  window.addEventListener("beforeunload", () => {
+    observer.disconnect();
+  });
 })();
