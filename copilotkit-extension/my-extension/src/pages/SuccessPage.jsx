@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useCopilotChat, useCopilotAction } from "@copilotkit/react-core";
-import { CopilotSidebar, useCopilotChatSuggestions } from "@copilotkit/react-ui";
+import { useCopilotChatSuggestions } from "@copilotkit/react-ui";
 import CopilotLayout from "../components/CopilotLayout";
+import InlineCopilotChat from "../components/InlineCopilotChat";
 
 export default function SuccessPage() {
   const [token, setToken] = useState("");
@@ -41,14 +42,7 @@ export default function SuccessPage() {
         pageText={pageText}
         onReset={handleReset}
       />
-      <CopilotSidebar
-        defaultOpen={true}
-        clickOutsideToClose={false}
-        labels={{
-          title: "Copilot Assistant",
-          initial: "👋 Welcome! Ask anything or use tools on this page.",
-        }}
-      />
+      <InlineCopilotChat/>
     </CopilotLayout>
   );
 }
