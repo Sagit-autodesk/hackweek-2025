@@ -2,16 +2,26 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function SuccessPage() {
-  const [text, setText] = useState("");
+  const [token, setToken] = useState("");
+  const [pageText, setPageText] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     chrome.storage.local.get("copilot_api_key", (result) => {
       if (result.copilot_api_key) {
-        setText(result.copilot_api_key);
+        setToken(result.copilot_api_key);
       } else {
         navigate("/");
       }
+    });
+
+    // ✅ Ask background for page text
+    chrome.runtime.sendMessage({ type: "GET_PAGE_TEXT" }, (response) => {
+        if (response?.text) {
+        setPageText(response.text);
+        } else {
+        setPageText("[No text returned or blocked]");
+        }
     });
   }, [navigate]);
 
@@ -23,23 +33,22 @@ export default function SuccessPage() {
 
   return (
     <>
-      <h3 style={{ marginTop: 0 }}>Hello World</h3>
-      <div>
-        <strong>Saved Token:</strong>
-        <div
-          style={{
-            background: "#fff",
-            padding: 5,
-            border: "1px solid #ccc",
-            borderRadius: 4,
-            fontSize: 12,
-            marginTop: 4,
-            wordBreak: "break-all",
-          }}
-        >
-          {text}
-        </div>
+      <h3 style={{ marginTop: 0 }}>Page Text</h3>
+      <div
+        style={{
+          background: "#fff",
+          padding: 5,
+          border: "1px solid #ccc",
+          borderRadius: 4,
+          fontSize: 12,
+          height: "200px",
+          overflowY: "auto",
+          whiteSpace: "pre-wrap",
+        }}
+      >
+        {pageText || "Loading page text..."}
       </div>
+
       <button
         onClick={handleReset}
         style={{

@@ -13,13 +13,24 @@
     position: "fixed",
     top: "0",
     right: "0",
-    height: "100vh",          // ✅ full window height
+    height: "100vh",
     width: "300px",
     border: "none",
     zIndex: "999999",
-    background: "white",      // ✅ fixes transparency
+    background: "white",
     boxShadow: "-2px 0 6px rgba(0,0,0,0.2)",
   });
 
   document.body.appendChild(iframe);
+
+  // ✅ Send page text to the iframe after it loads
+  iframe.onload = () => {
+    const text = document.body.innerText;
+  
+    // ✅ Use the extension origin to scope it safely
+    const origin = new URL(chrome.runtime.getURL("/")).origin;
+  
+    iframe.contentWindow.postMessage({ type: "PAGE_TEXT", text }, origin);
+  };
+  
 })();
