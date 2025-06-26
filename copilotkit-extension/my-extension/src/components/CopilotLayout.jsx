@@ -16,6 +16,8 @@ export default function CopilotLayout({ children }) {
   console.log("publicApiKey", publicApiKey);
   if (!publicApiKey) return "No API Key";
 
+  // Todo: for local runtime pass runtimeUrl="http://localhost:4000/copilotkit"
+  
   return (
     <CopilotKit publicApiKey={publicApiKey}>
       {children}
