@@ -125,13 +125,16 @@ export default function FormPage() {
         }}>
           Settings
         </h2>
-        <p style={{
-          margin: 0,
-          color: "#6b7280",
-          fontSize: "14px",
+        <div style={{
+          padding: "12px",
+          backgroundColor: "#fef3c7",
+          border: "1px solid #fcd34d",
+          borderRadius: "8px",
+          fontSize: "13px",
+          color: "#92400e"
         }}>
-          Configure your AI assistant
-        </p>
+          <strong>⚠️ Important:</strong> You must have a valid CopilotKit API key for the chat to work properly.
+        </div>
       </div>
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "24px" }}>

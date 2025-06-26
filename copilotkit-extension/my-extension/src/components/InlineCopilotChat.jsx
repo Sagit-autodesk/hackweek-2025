@@ -3,23 +3,121 @@ import { useEffect, useRef } from "react";
 
 export default function InlineCopilotChat() {
   const chatContainerRef = useRef(null);
+  const isUserScrollingRef = useRef(false);
+  const scrollTimeoutRef = useRef(null);
 
-  // Auto-scroll to bottom when chat updates
+  // Simplified auto-scroll that respects user interaction
   useEffect(() => {
+    let isComponentMounted = true;
+
     const scrollToBottom = () => {
-      if (chatContainerRef.current) {
-        const scrollElement = chatContainerRef.current.querySelector('[data-copilot-chat-container]') || 
-                             chatContainerRef.current.querySelector('.copilot-chat-container') ||
-                             chatContainerRef.current;
-        scrollElement.scrollTop = scrollElement.scrollHeight;
+      if (!isComponentMounted || !chatContainerRef.current || isUserScrollingRef.current) {
+        return;
+      }
+
+      try {
+        // Find the scrollable container
+        const container = chatContainerRef.current.querySelector('[data-copilot-chat-container]') ||
+                         chatContainerRef.current.querySelector('.copilot-chat-container') ||
+                         chatContainerRef.current;
+        
+        if (container && container.scrollHeight > container.clientHeight) {
+          container.scrollTop = container.scrollHeight;
+        }
+      } catch (error) {
+        // Silently handle any DOM access errors
+        console.debug('Scroll error (safely ignored):', error);
       }
     };
 
-    // Scroll to bottom on mount and periodically check for new messages
-    const intervalId = setInterval(scrollToBottom, 100);
-    scrollToBottom();
+    const handleScroll = (e) => {
+      if (!isComponentMounted) return;
+      
+      try {
+        const target = e.target;
+        const isAtBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 5;
+        isUserScrollingRef.current = !isAtBottom;
+        
+        // Clear any pending auto-scroll when user scrolls
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current);
+          scrollTimeoutRef.current = null;
+        }
+      } catch (error) {
+        console.debug('Scroll handler error (safely ignored):', error);
+      }
+    };
 
-    return () => clearInterval(intervalId);
+    // Simple interval-based approach for auto-scrolling
+    const checkAndScroll = () => {
+      if (!isComponentMounted) return;
+      
+      scrollToBottom();
+      
+      // Reset user scrolling flag after a delay if they haven't scrolled recently
+      if (isUserScrollingRef.current) {
+        scrollTimeoutRef.current = setTimeout(() => {
+          if (isComponentMounted) {
+            isUserScrollingRef.current = false;
+          }
+        }, 3000); // Reset after 3 seconds of no scrolling
+      }
+    };
+
+    // Set up scroll listener on a simple interval
+    const setupScrollListener = () => {
+      if (!chatContainerRef.current) return null;
+
+      try {
+        const container = chatContainerRef.current.querySelector('[data-copilot-chat-container]') ||
+                         chatContainerRef.current.querySelector('.copilot-chat-container') ||
+                         chatContainerRef.current;
+        
+        if (container) {
+          container.addEventListener('scroll', handleScroll, { passive: true });
+          return () => {
+            try {
+              container.removeEventListener('scroll', handleScroll);
+            } catch (error) {
+              // Ignore cleanup errors
+            }
+          };
+        }
+      } catch (error) {
+        console.debug('Listener setup error (safely ignored):', error);
+      }
+      return null;
+    };
+
+    // Initial setup
+    const cleanupListener = setupScrollListener();
+    
+    // Simple interval for checking new messages
+    const intervalId = setInterval(checkAndScroll, 500);
+
+    // Initial scroll
+    setTimeout(scrollToBottom, 100);
+
+    return () => {
+      isComponentMounted = false;
+      
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+      
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+        scrollTimeoutRef.current = null;
+      }
+      
+      if (cleanupListener) {
+        try {
+          cleanupListener();
+        } catch (error) {
+          // Ignore cleanup errors
+        }
+      }
+    };
   }, []);
 
   return (
@@ -27,8 +125,8 @@ export default function InlineCopilotChat() {
       flex: 1,
       display: "flex",
       flexDirection: "column",
-      marginTop: "16px",
-      minHeight: 0 // Important for flex children to shrink
+      marginTop: "8px",
+      minHeight: 0
     }}>
       <div
         ref={chatContainerRef}
@@ -59,10 +157,9 @@ export default function InlineCopilotChat() {
           flex: 1,
           display: "flex",
           flexDirection: "column",
-          fontSize: "16px", // Making text bigger
           minHeight: 0,
-          paddingTop: "8px", // Add some space from the top gradient line
-          overflow: "auto" // Enable scrolling
+          paddingTop: "8px",
+          overflow: "auto"
         }}>
           <style>
             {`
@@ -85,19 +182,69 @@ export default function InlineCopilotChat() {
               div[data-copilot-chat-container]::-webkit-scrollbar-thumb:hover {
                 background: #94a3b8;
               }
-              
-              /* Ensure CopilotChat takes full height and is scrollable */
-              .copilot-chat-wrapper {
-                height: 100%;
-                display: flex;
-                flex-direction: column;
+
+              /* Match suggestions text size to chat messages */
+              .copilot-chat-suggestions button,
+              .copilot-chat-suggestions .suggestion,
+              [data-copilot-suggestions] button,
+              [data-copilot-suggestions] .suggestion {
+                font-size: 16px !important;
+              }
+
+              /* Make placeholder text match chat messages */
+              .copilot-chat-input input::placeholder,
+              .copilot-chat-input textarea::placeholder,
+              [data-copilot-input] input::placeholder,
+              [data-copilot-input] textarea::placeholder,
+              input[placeholder*="Ask anything"]::placeholder,
+              textarea[placeholder*="Ask anything"]::placeholder {
+                font-size: 16px !important;
+              }
+
+              /* Make typed text larger to match chat messages */
+              .copilot-chat-input input,
+              .copilot-chat-input textarea,
+              [data-copilot-input] input,
+              [data-copilot-input] textarea,
+              input[type="text"],
+              textarea {
+                font-size: 16px !important;
+                line-height: 1.5 !important;
+              }
+
+              /* More comprehensive targeting for input fields */
+              div[class*="copilot"] input,
+              div[class*="copilot"] textarea,
+              [class*="input"] input,
+              [class*="input"] textarea,
+              [data-testid*="input"] input,
+              [data-testid*="input"] textarea {
+                font-size: 16px !important;
+                line-height: 1.5 !important;
+              }
+
+              /* Target suggestions specifically */
+              button[class*="suggestion"],
+              div[class*="suggestion"],
+              .copilot-suggestion,
+              [data-suggestion] {
+                font-size: 16px !important;
               }
               
-              /* Make the chat messages container scrollable */
-              .copilot-chat-messages {
-                flex: 1;
-                overflow-y: auto;
-                overflow-x: hidden;
+              /* Ensure chat messages are consistent size */
+              .copilot-message,
+              [data-copilot-message],
+              div[class*="message"],
+              p, span, div {
+                font-size: 16px;
+                line-height: 1.5;
+              }
+
+              /* Global font size for all CopilotKit components */
+              [class*="copilot"],
+              [data-copilot] {
+                font-size: 16px !important;
+                line-height: 1.5 !important;
               }
             `}
           </style>

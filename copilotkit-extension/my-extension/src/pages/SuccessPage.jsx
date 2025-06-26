@@ -62,6 +62,79 @@ export default function SuccessPage() {
           flexDirection: "column",
           position: "relative"
         }}>
+          {/* Top corner buttons */}
+          <div style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "8px",
+            padding: "12px 0",
+            marginBottom: "8px"
+          }}>
+            <button
+              onClick={handleSettings}
+              style={{
+                padding: "6px 12px",
+                fontSize: "12px",
+                fontWeight: "500",
+                border: "1px solid #d1d5db",
+                borderRadius: "6px",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                fontFamily: "inherit",
+                backgroundColor: "white",
+                color: "#4b5563",
+                boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px"
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = "#f9fafb";
+                e.target.style.borderColor = "#9ca3af";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = "white";
+                e.target.style.borderColor = "#d1d5db";
+              }}
+            >
+              ⚙️ Settings
+            </button>
+
+            <button
+              onClick={() => {
+                chrome.storage.local.remove("copilot_chat_messages", () => {
+                  location.reload();
+                });
+              }}
+              style={{
+                padding: "6px 12px",
+                fontSize: "12px",
+                fontWeight: "500",
+                border: "1px solid #d1d5db",
+                borderRadius: "6px",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                fontFamily: "inherit",
+                backgroundColor: "white",
+                color: "#4b5563",
+                boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px"
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = "#f9fafb";
+                e.target.style.borderColor = "#9ca3af";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = "white";
+                e.target.style.borderColor = "#d1d5db";
+              }}
+            >
+              🗑️ Clear
+            </button>
+          </div>
+
           <MainContent
             pageText={pageText}
             mcpServers={mcpList}
@@ -78,7 +151,7 @@ export default function SuccessPage() {
             borderTop: "1px solid #f3f4f6",
             marginTop: "12px"
           }}>
-            Powered by <strong style={{ color: "#0ea5e9" }}>CopilotKit</strong>
+            Powered by CopilotKit
           </div>
         </div>
       </CopilotLayout>
@@ -175,67 +248,6 @@ function MainContent({ pageText, mcpServers, onSettings }) {
     ),
   });
 
-  const smallButtonStyle = {
-    padding: "6px 10px",
-    fontSize: "12px",
-    fontWeight: "500",
-    border: "1px solid #d1d5db",
-    borderRadius: "6px",
-    cursor: "pointer",
-    transition: "all 0.2s ease",
-    fontFamily: "inherit",
-    backgroundColor: "white",
-    color: "#4b5563",
-    boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-  };
-
-  return (
-    <>
-      {/* Top corner buttons */}
-      <div style={{
-        position: "absolute",
-        top: "12px",
-        right: "12px",
-        display: "flex",
-        gap: "6px",
-        zIndex: 10
-      }}>
-        <button
-          onClick={onSettings}
-          style={smallButtonStyle}
-          title="Settings"
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = "#f9fafb";
-            e.target.style.borderColor = "#9ca3af";
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = "white";
-            e.target.style.borderColor = "#d1d5db";
-          }}
-        >
-          ⚙️
-        </button>
-
-        <button
-          onClick={() => {
-            chrome.storage.local.remove("copilot_chat_messages", () => {
-              location.reload();
-            });
-          }}
-          style={smallButtonStyle}
-          title="Clear Chat History"
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = "#f9fafb";
-            e.target.style.borderColor = "#9ca3af";
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = "white";
-            e.target.style.borderColor = "#d1d5db";
-          }}
-        >
-          🗑️
-        </button>
-      </div>
-    </>
-  );
+  // This component no longer needs to render the buttons since they're in the parent
+  return null;
 }
