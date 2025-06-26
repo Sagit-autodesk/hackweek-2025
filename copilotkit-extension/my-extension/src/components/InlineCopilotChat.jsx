@@ -183,32 +183,32 @@ export default function InlineCopilotChat() {
                 background: #94a3b8;
               }
 
-              /* Match suggestions text size to chat messages */
+              /* Make suggestions text 14px */
               .copilot-chat-suggestions button,
               .copilot-chat-suggestions .suggestion,
               [data-copilot-suggestions] button,
               [data-copilot-suggestions] .suggestion {
-                font-size: 16px !important;
+                font-size: 14px !important;
               }
 
-              /* Make placeholder text match chat messages */
+              /* Make placeholder text 14px */
               .copilot-chat-input input::placeholder,
               .copilot-chat-input textarea::placeholder,
               [data-copilot-input] input::placeholder,
               [data-copilot-input] textarea::placeholder,
               input[placeholder*="Ask anything"]::placeholder,
               textarea[placeholder*="Ask anything"]::placeholder {
-                font-size: 16px !important;
+                font-size: 14px !important;
               }
 
-              /* Make typed text larger to match chat messages */
+              /* Make typed text 14px */
               .copilot-chat-input input,
               .copilot-chat-input textarea,
               [data-copilot-input] input,
               [data-copilot-input] textarea,
               input[type="text"],
               textarea {
-                font-size: 16px !important;
+                font-size: 14px !important;
                 line-height: 1.5 !important;
               }
 
@@ -219,7 +219,7 @@ export default function InlineCopilotChat() {
               [class*="input"] textarea,
               [data-testid*="input"] input,
               [data-testid*="input"] textarea {
-                font-size: 16px !important;
+                font-size: 14px !important;
                 line-height: 1.5 !important;
               }
 
@@ -228,22 +228,22 @@ export default function InlineCopilotChat() {
               div[class*="suggestion"],
               .copilot-suggestion,
               [data-suggestion] {
-                font-size: 16px !important;
+                font-size: 14px !important;
               }
               
-              /* Ensure chat messages are consistent size */
+              /* Ensure chat messages are 14px */
               .copilot-message,
               [data-copilot-message],
               div[class*="message"],
               p, span, div {
-                font-size: 16px;
+                font-size: 14px;
                 line-height: 1.5;
               }
 
-              /* Global font size for all CopilotKit components */
+              /* Global font size for all CopilotKit components set to 14px */
               [class*="copilot"],
               [data-copilot] {
-                font-size: 16px !important;
+                font-size: 14px !important;
                 line-height: 1.5 !important;
               }
             `}

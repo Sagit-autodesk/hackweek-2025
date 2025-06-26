@@ -265,7 +265,7 @@ export default function FormPage() {
           onMouseEnter={(e) => text && (e.target.style.backgroundColor = "#0284c7")}
           onMouseLeave={(e) => text && (e.target.style.backgroundColor = "#0ea5e9")}
         >
-          🚀 Let's Go
+          🚀 Start Chat
         </button>
       </div>
     </div>

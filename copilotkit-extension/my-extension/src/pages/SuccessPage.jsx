@@ -74,7 +74,7 @@ export default function SuccessPage() {
               onClick={handleSettings}
               style={{
                 padding: "6px 12px",
-                fontSize: "12px",
+                fontSize: "14px",
                 fontWeight: "500",
                 border: "1px solid #d1d5db",
                 borderRadius: "6px",
@@ -108,7 +108,7 @@ export default function SuccessPage() {
               }}
               style={{
                 padding: "6px 12px",
-                fontSize: "12px",
+                fontSize: "14px",
                 fontWeight: "500",
                 border: "1px solid #d1d5db",
                 borderRadius: "6px",
