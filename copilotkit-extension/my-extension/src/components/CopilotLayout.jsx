@@ -4,22 +4,30 @@ import "@copilotkit/react-ui/styles.css";
 
 export default function CopilotLayout({ children }) {
   const [publicApiKey, setPublicApiKey] = useState(null);
+  const [isLocalRuntime, setIsLocalRuntime] = useState(false);
 
   useEffect(() => {
-    chrome.storage.local.get("copilot_api_key", (result) => {
+    chrome.storage.local.get(["copilot_api_key", "copilot_use_local_runtime"], (result) => {
       if (result.copilot_api_key) {
         setPublicApiKey(result.copilot_api_key);
       }
+      // Check if local runtime should be used
+      setIsLocalRuntime(!!result.copilot_use_local_runtime);
     });
   }, []);
 
   console.log("publicApiKey", publicApiKey);
+  console.log("isLocalRuntime", isLocalRuntime);
+  
   if (!publicApiKey) return "No API Key";
 
-  // Todo: for local runtime pass runtimeUrl="http://localhost:4000/copilotkit"
-  
+  // Use local runtime if configured, otherwise use production
+  const copilotProps = isLocalRuntime
+    ? { runtimeUrl: "http://localhost:4000/copilotkit" }
+    : { publicApiKey };
+
   return (
-    <CopilotKit publicApiKey={publicApiKey}>
+    <CopilotKit {...copilotProps}>
       {children}
     </CopilotKit>
   );

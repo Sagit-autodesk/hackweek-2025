@@ -9,15 +9,17 @@ import InlineCopilotChat from "../components/InlineCopilotChat";
 export default function SuccessPage() {
     const [pageText, setPageText] = useState(null); // null to detect when it's ready
     const [mcpList, setMcpList] = useState([]);
+    const [isLocalRuntime, setIsLocalRuntime] = useState(false);
     const navigate = useNavigate();
   
     useEffect(() => {
-      chrome.storage.local.get(["copilot_api_key", "copilot_page_text", "copilot_mcp_servers"], (res) => {
+      chrome.storage.local.get(["copilot_api_key", "copilot_page_text", "copilot_mcp_servers", "copilot_use_local_runtime"], (res) => {
         if (!res.copilot_api_key) {
           navigate("/");
         } else {
           setPageText(res.copilot_page_text || "");
           setMcpList(res.copilot_mcp_servers || []);
+          setIsLocalRuntime(!!res.copilot_use_local_runtime);
         }
       });
     }, [navigate]);
@@ -151,7 +153,7 @@ export default function SuccessPage() {
             borderTop: "1px solid #f3f4f6",
             marginTop: "12px"
           }}>
-            Powered by CopilotKit
+            Powered by CopilotKit {isLocalRuntime ? "- local runtime" : "- production runtime"}
           </div>
         </div>
       </CopilotLayout>
