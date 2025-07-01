@@ -19,11 +19,12 @@ export default function CopilotLayout({ children }) {
   console.log("publicApiKey", publicApiKey);
   console.log("isLocalRuntime", isLocalRuntime);
   
+  // Always require API key
   if (!publicApiKey) return "No API Key";
 
   // Use local runtime if configured, otherwise use production
   const copilotProps = isLocalRuntime
-    ? { runtimeUrl: "http://localhost:4000/copilotkit" }
+    ? { publicApiKey, runtimeUrl: "http://localhost:4000/copilotkit" }
     : { publicApiKey };
 
   return (

@@ -11,6 +11,7 @@ export default function FormPage() {
 
   useEffect(() => {
     chrome.storage.local.get(["copilot_api_key", "copilot_from_settings", "copilot_mcp_servers", "copilot_use_local_runtime"], (result) => {
+      // Always require API key, regardless of runtime mode
       if (result.copilot_api_key && !result.copilot_from_settings) {
         navigate("/success");
         return;
@@ -46,6 +47,7 @@ export default function FormPage() {
   };
 
   const handleSave = () => {
+    // Always require API key
     if (!text) return;
 
     chrome.storage.local.set({
@@ -119,9 +121,9 @@ export default function FormPage() {
   };
 
   return (
-    <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+    <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
       {/* Header */}
-      <div style={{ marginBottom: "32px" }}>
+      <div style={{ marginBottom: "24px" }}>
         <h2 style={{ 
           margin: 0, 
           fontSize: "24px",
@@ -139,11 +141,18 @@ export default function FormPage() {
           fontSize: "13px",
           color: "#92400e"
         }}>
-          <strong>⚠️ Important:</strong> You must have a valid CopilotKit API key for the chat to work properly.
+          <strong>⚠️ Important:</strong> You must have a valid CopilotKit API key for the chat to work properly in production runtime.
         </div>
       </div>
 
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "24px" }}>
+      <div style={{ 
+        flex: 1, 
+        display: "flex", 
+        flexDirection: "column", 
+        gap: "20px",
+        overflow: "auto",
+        paddingRight: "4px" 
+      }}>
         {/* API Key Section */}
         <div>
           <label style={{ 
@@ -181,6 +190,79 @@ export default function FormPage() {
               <li>Sign up for a <strong>free account</strong> if you don't have one</li>
               <li>Navigate to <strong>API Keys</strong> section and create a new key</li>
               <li>CopilotKit offers generous free tier limits to get started</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Local Runtime Mode Section */}
+        <div>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            padding: "12px",
+            backgroundColor: "white",
+            border: "1px solid #e5e7eb",
+            borderRadius: "8px"
+          }}>
+            <div style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              cursor: "pointer"
+            }} onClick={() => setUseLocalRuntime(!useLocalRuntime)}>
+              <div style={{
+                width: "44px",
+                height: "24px",
+                backgroundColor: useLocalRuntime ? "#0ea5e9" : "#d1d5db",
+                borderRadius: "12px",
+                position: "relative",
+                transition: "all 0.2s ease",
+                cursor: "pointer"
+              }}>
+                <div style={{
+                  width: "20px",
+                  height: "20px",
+                  backgroundColor: "white",
+                  borderRadius: "50%",
+                  position: "absolute",
+                  top: "2px",
+                  left: useLocalRuntime ? "22px" : "2px",
+                  transition: "all 0.2s ease",
+                  boxShadow: "0 1px 3px 0 rgb(0 0 0 / 0.1)"
+                }} />
+              </div>
+              <span style={{ fontSize: "14px", color: "#374151", fontWeight: "500" }}>
+                Local Runtime Mode
+              </span>
+            </div>
+          </div>
+          <div style={{
+            marginTop: "8px",
+            padding: "12px",
+            backgroundColor: useLocalRuntime ? "#fef3c7" : "#f0f9ff",
+            border: `1px solid ${useLocalRuntime ? "#fcd34d" : "#e0f2fe"}`,
+            borderRadius: "6px",
+            fontSize: "13px",
+            color: useLocalRuntime ? "#92400e" : "#0369a1"
+          }}>
+            <p style={{ margin: "0 0 8px 0", fontWeight: "500" }}>
+              {useLocalRuntime ? "⚠️ Local Runtime:" : "🌐 Production Runtime:"}
+            </p>
+            <ul style={{ margin: 0, paddingLeft: "16px" }}>
+              {useLocalRuntime ? (
+                <>
+                  <li>Requires local CopilotKit server running on <code>localhost:4000</code></li>
+                  <li>Better for development and testing</li>
+                  <li>Uses your own LLM adapter configuration</li>
+                </>
+              ) : (
+                <>
+                  <li>Uses CopilotKit cloud service</li>
+                  <li>Requires valid API key with available credits</li>
+                  <li>Ready to use without local setup</li>
+                </>
+              )}
             </ul>
           </div>
         </div>
@@ -261,88 +343,6 @@ export default function FormPage() {
           >
             ➕ Add Server
           </button>
-        </div>
-
-        {/* Runtime Configuration Section */}
-        <div>
-          <label style={{ 
-            display: "block", 
-            marginBottom: "8px", 
-            fontSize: "14px",
-            fontWeight: "600",
-            color: "#374151"
-          }}>
-            🔧 Runtime Configuration
-          </label>
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            padding: "12px",
-            backgroundColor: "white",
-            border: "1px solid #e5e7eb",
-            borderRadius: "8px"
-          }}>
-            <div style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              cursor: "pointer"
-            }} onClick={() => setUseLocalRuntime(!useLocalRuntime)}>
-              <div style={{
-                width: "44px",
-                height: "24px",
-                backgroundColor: useLocalRuntime ? "#0ea5e9" : "#d1d5db",
-                borderRadius: "12px",
-                position: "relative",
-                transition: "all 0.2s ease",
-                cursor: "pointer"
-              }}>
-                <div style={{
-                  width: "20px",
-                  height: "20px",
-                  backgroundColor: "white",
-                  borderRadius: "50%",
-                  position: "absolute",
-                  top: "2px",
-                  left: useLocalRuntime ? "22px" : "2px",
-                  transition: "all 0.2s ease",
-                  boxShadow: "0 1px 3px 0 rgb(0 0 0 / 0.1)"
-                }} />
-              </div>
-              <span style={{ fontSize: "14px", color: "#374151", fontWeight: "500" }}>
-                Use Local Runtime
-              </span>
-            </div>
-          </div>
-          <div style={{
-            marginTop: "8px",
-            padding: "12px",
-            backgroundColor: useLocalRuntime ? "#fef3c7" : "#f0f9ff",
-            border: `1px solid ${useLocalRuntime ? "#fcd34d" : "#e0f2fe"}`,
-            borderRadius: "6px",
-            fontSize: "13px",
-            color: useLocalRuntime ? "#92400e" : "#0369a1"
-          }}>
-            <p style={{ margin: "0 0 8px 0", fontWeight: "500" }}>
-              {useLocalRuntime ? "⚠️ Local Runtime:" : "🌐 Production Runtime:"}
-            </p>
-            <ul style={{ margin: 0, paddingLeft: "16px" }}>
-              {useLocalRuntime ? (
-                <>
-                  <li>Requires local CopilotKit server running on <code>localhost:4000</code></li>
-                  <li>Better for development and testing</li>
-                  <li>Uses your own LLM adapter configuration</li>
-                </>
-              ) : (
-                <>
-                  <li>Uses CopilotKit cloud service</li>
-                  <li>Requires valid API key with available credits</li>
-                  <li>Ready to use without local setup</li>
-                </>
-              )}
-            </ul>
-          </div>
         </div>
 
         {/* Submit Button */}
