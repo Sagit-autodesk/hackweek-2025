@@ -5,12 +5,20 @@ An intelligent Chrome extension that provides AI assistance with automatic page 
 ## 🎯 Motivation
 
 This Chrome extension serves as an AI Assistant that:
-- Automatically captures your browsing context
+- Automatically captures your browsing context from any website
+- Requires explicit page approval for privacy protection
 - Assists with LLM integration and MCP server configurations
 - Helps create Jira tickets, interact with Slack, and use internal MCPs
 - Provides seamless AI assistance directly in your browser
 
 Built with **CopilotKit** for a modern, interactive AI experience.
+
+## 🔒 Privacy-First Design
+
+- **Page Approval System**: AI assistant only accesses content from explicitly approved pages
+- **24-hour Expiration**: All page permissions expire automatically after 24 hours
+- **User Control**: Full management of approved pages in settings
+- **No Auto-Collection**: Extension won't "drink" content from pages without permission
 
 ## 🚀 Extension Setup
 
@@ -88,12 +96,16 @@ The remaining folders in the project root are experimental attempts to create lo
 - **Backend**: Express.js, CopilotKit Runtime
 - **AI Integration**: LLM adapters (OpenAI → Autodesk LLM)
 - **Transport**: SSE (transitioning to HTTP streaming)
+- **Privacy**: Page-level approval system with automatic expiration
+- **Compatibility**: Works on all websites (user approval required)
 
 ## 📝 Development Notes
 
 - Extension contains no sensitive data and is safe for development use
+- Works on all websites with user-controlled page approval system
 - Local development with MCP servers can use ngrok for public endpoints
 - CopilotKit transport layer is in transition - monitor for HTTP streaming support
+- Page approval system prevents unauthorized data collection
 
 ---
 

@@ -20,6 +20,7 @@ export default function SuccessPage() {
         if (!res.copilot_api_key) {
           navigate("/");
         } else {
+          // Set page text (even if empty) to stop loading state
           setPageText(res.copilot_page_text || "");
           setMcpList(res.copilot_mcp_servers || []);
           setIsLocalRuntime(!!res.copilot_use_local_runtime);
@@ -375,6 +376,7 @@ export default function SuccessPage() {
 
 function MainContent({ pageText, mcpServers, onSettings }) {
   const { setMcpServers } = useCopilotChat();
+  const [isPageStillApproved, setIsPageStillApproved] = useState(true);
 
   useEffect(() => {
     if (Array.isArray(mcpServers)) {
@@ -382,9 +384,37 @@ function MainContent({ pageText, mcpServers, onSettings }) {
     }
   }, [mcpServers, setMcpServers]);
 
+  // Double-check page approval before sending content to CopilotKit
+  useEffect(() => {
+    const checkCurrentApproval = () => {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs[0]?.url) {
+          const currentUrl = tabs[0].url;
+          
+          chrome.storage.local.get(['approved_pages'], (result) => {
+            const approvedPages = result.approved_pages || {};
+            const now = Date.now();
+            
+            if (approvedPages[currentUrl] && approvedPages[currentUrl] > now) {
+              setIsPageStillApproved(true);
+            } else {
+              setIsPageStillApproved(false);
+            }
+          });
+        }
+      });
+    };
+
+    checkCurrentApproval();
+    
+    // Check every minute to catch expiry quickly
+    const interval = setInterval(checkCurrentApproval, 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   useCopilotReadable({
     description: "The visible text content of the current page",
-    value: pageText || "",
+    value: isPageStillApproved ? (pageText || "") : "",
   });
 
   useCopilotChatSuggestions({
